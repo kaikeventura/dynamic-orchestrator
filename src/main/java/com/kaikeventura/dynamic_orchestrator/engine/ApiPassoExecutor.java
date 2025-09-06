@@ -7,6 +7,7 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -59,9 +60,9 @@ public class ApiPassoExecutor implements PassoExecutor {
             MediaType contentType = response.getHeaders().getContentType();
             try {
                 if (contentType != null) {
-                    Map<String, Object> responseMap = objectMapper.readValue(response.getBody(), Map.class);
-                    if (responseMap != null) {
-                        salvarRespostaNoContexto(passo, responseMap, variaveis, contexto);
+                    LinkedHashMap responseBody = objectMapper.readValue(response.getBody(), LinkedHashMap.class);
+                    if (responseBody != null) {
+                        salvarRespostaNoContexto(passo, responseBody, variaveis, contexto);
                     }
                 } else {
                     contexto.set(passo.getId(), response.getBody());
@@ -74,7 +75,7 @@ public class ApiPassoExecutor implements PassoExecutor {
 
     private void salvarRespostaNoContexto(
             FluxoConfig.Passo passo,
-            Map<String, Object> responseMap,
+            LinkedHashMap<Object, Object> responseBody,
             List<FluxoConfig.Variavel> variaveis,
             VariavelContexto contexto
     ) {
@@ -96,8 +97,8 @@ public class ApiPassoExecutor implements PassoExecutor {
                     String campoResposta = matcher.group(2);      // ex: preco
 
                     // se for o passo atual e a resposta contém o campo
-                    if (passo.getId().equals(idPassoReferencia) && responseMap.containsKey(campoResposta)) {
-                        contexto.set(var.getId(), responseMap.get(campoResposta));
+                    if (passo.getId().equals(idPassoReferencia) && responseBody.containsKey(campoResposta)) {
+                        contexto.set(var.getId(), responseBody.get(campoResposta));
                     }
                 }
             }
