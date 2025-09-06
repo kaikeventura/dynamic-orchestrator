@@ -85,6 +85,6 @@ public class FluxoConfig {
 
     @Data
     public static class Resposta {
-        private Map<String, String> body;
+        private Object body;
     }
 }

@@ -41,6 +41,8 @@ public class ApiPassoExecutor implements PassoExecutor {
             url += "?" + query;
         }
 
+        url = VariavelSubstituidor.substituir(url, contexto);
+
         HttpMethod httpMethod = HttpMethod.valueOf(req.getMetodo().toUpperCase());
 
         HttpEntity<Object> requestEntity;
@@ -86,7 +88,7 @@ public class ApiPassoExecutor implements PassoExecutor {
                 // exemplo: {{api$.passo-consulta-preco-produto$.resposta$.preco}}
 
                 // extrai o passo e o campo
-                String pattern = "\\{\\{api\\$\\.(.+?)\\$\\.resposta\\$\\.(.+?)\\}\\}";
+                String pattern = "\\{\\{api\\$\\.(.+?)\\$\\.resposta\\$\\.(.+?)}}";
                 java.util.regex.Matcher matcher = java.util.regex.Pattern.compile(pattern).matcher(idReferencia);
 
                 if (matcher.matches()) {
