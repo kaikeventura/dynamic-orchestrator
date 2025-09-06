@@ -1,0 +1,51 @@
+{
+  "fluxo": "feriados-nacionais",
+  "contrato": {
+    "entrada": [
+      {
+        "id": "id-ano-referencia",
+        "nomeCampo": "anoReferencia",
+        "obrigatorio": true
+      }
+    ],
+    "saida": []
+  },
+  "orquestrador": {
+    "passos": [
+      {
+        "ordem": 1,
+        "id": "passo-consulta-feriados",
+        "tipo": "API",
+        "integracao": {
+          "requisicao": {
+            "metodo": "GET",
+            "url": "https://brasilapi.com.br/api/feriados/v1/{{variaveis$.variavel-ano-referencia}}",
+            "queryParams": null,
+            "headers": null,
+            "body": null
+          },
+          "resposta": {
+            "body": [
+              {
+                "date": "String",
+                "name": "String",
+                "type": "String"
+              }
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "metadados": {
+    "variaveis": [
+      {
+        "id": "variavel-ano-referencia",
+        "origem": {
+          "tipoReferencia": "contrato",
+          "idReferencia": "{{entrada$.id-ano-referencia}}"
+        }
+      }
+    ]
+  }
+}

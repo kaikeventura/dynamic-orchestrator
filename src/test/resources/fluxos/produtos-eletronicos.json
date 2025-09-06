@@ -1,0 +1,122 @@
+{
+  "fluxo": "produtos-eletronicos",
+  "contrato": {
+    "entrada": [
+      {
+        "id": "id-produto",
+        "nomeCampo": "produtoId",
+        "obrigatorio": true
+      },
+      {
+        "id": "quantidade-produto",
+        "nomeCampo": "produtoQuantidade",
+        "obrigatorio": true
+      }
+    ],
+    "saida": [
+      {
+        "id": "valor-produto",
+        "nomeCampo": "valorProduto",
+        "valor": "{{java(transformadorLongParaBigDecimal(variaveis$.variavel-valor-produto, 2))}}"
+      },
+      {
+        "id": "ultima-atualizacao",
+        "nomeCampo": "ultimaAtualizacao",
+        "valor": "{{variaveis$.variavel-ultima-atualizacao-produto}}"
+      }
+    ]
+  },
+  "orquestrador": {
+    "passos": [
+      {
+        "ordem": 1,
+        "id": "passo-access-token",
+        "tipo": "API",
+        "integracao": {
+          "requisicao": {
+            "metodo": "GET",
+            "url": "https://cd3f203a-ab69-4ac7-8e27-69afe26aa144.mock.pstmn.io/sts",
+            "queryParams": {
+              "apiKey": "",
+              "secretKey": ""
+            },
+            "headers": {
+              "Content-Type": "json",
+              "correlationId": "uuid"
+            },
+            "body": null
+          },
+          "resposta": {
+            "body": {
+              "accessToken": "String",
+              "refreshToken": "String"
+            }
+          }
+        }
+      },
+      {
+        "ordem": 2,
+        "id": "passo-consulta-preco-produto",
+        "tipo": "API",
+        "integracao": {
+          "requisicao": {
+            "metodo": "POST",
+            "url": "https://cd3f203a-ab69-4ac7-8e27-69afe26aa144.mock.pstmn.io/preco",
+            "queryParams": {
+              "idDoProduto": "{{variaveis$.variavel-id-produto}}"
+            },
+            "headers": {
+              "Authorization": "{{variaveis$.variavel-access-token}}"
+            },
+            "body": null
+          },
+          "resposta": {
+            "body": {
+              "preco": "Long",
+              "ultimaAtualizacao": "String"
+            }
+          }
+        }
+      }
+    ]
+  },
+  "metadados": {
+    "variaveis": [
+      {
+        "id": "variavel-id-produto",
+        "origem": {
+          "tipoReferencia": "contrato",
+          "idReferencia": "{{entrada$.id-produto}}"
+        }
+      },
+      {
+        "id": "variavel-quantidade-produto",
+        "origem": {
+          "tipoReferencia": "contrato",
+          "idReferencia": "{{entrada$.quantidade-produto}}"
+        }
+      },
+      {
+        "id": "variavel-access-token",
+        "origem": {
+          "tipoReferencia": "orquestrador",
+          "idReferencia": "{{api$.passo-access-token$.resposta$.accessToken}}"
+        }
+      },
+      {
+        "id": "variavel-valor-produto",
+        "origem": {
+          "tipoReferencia": "orquestrador",
+          "idReferencia": "{{api$.passo-consulta-preco-produto$.resposta$.preco}}"
+        }
+      },
+      {
+        "id": "variavel-ultima-atualizacao-produto",
+        "origem": {
+          "tipoReferencia": "orquestrador",
+          "idReferencia": "{{api$.passo-consulta-preco-produto$.resposta$.ultimaAtualizacao}}"
+        }
+      }
+    ]
+  }
+}
