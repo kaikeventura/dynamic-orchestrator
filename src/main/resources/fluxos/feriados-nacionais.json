@@ -8,7 +8,13 @@
         "obrigatorio": true
       }
     ],
-    "saida": []
+    "saida": [
+      {
+        "id": "lista-feriados",
+        "nomeCampo": "feriados",
+        "valor": "{{java(trasformadorListaDeObjetos(variaveis$.variavel-lista-feriados, estruturas$.estrutura-feriados-raw, estruturas$.estrutura-feriados, mapeamentos$.mapeamento-feriados))}}"
+      }
+    ]
   },
   "orquestrador": {
     "passos": [
@@ -45,6 +51,39 @@
           "tipoReferencia": "contrato",
           "idReferencia": "{{entrada$.id-ano-referencia}}"
         }
+      },
+      {
+        "id": "variavel-lista-feriados",
+        "origem": {
+          "tipoReferencia": "orquestrador",
+          "idReferencia": "{{api$.passo-consulta-feriados$.resposta$.<List>}}"
+        }
+      }
+    ],
+    "estruturas": [
+      {
+        "id": "estrutura-feriados-raw",
+        "valor": {
+          "date": "String",
+          "name": "String",
+          "type": "String"
+        }
+      },
+      {
+        "id": "estrutura-feriados",
+        "valor": {
+          "dataFeriado": "String",
+          "nameFeriado": "String"
+        }
+      }
+    ],
+    "mapeamentos": [
+      {
+        "id": "mapeamento-feriados",
+        "valor": [
+          { "origem": "date", "destino": "dataFeriado" },
+          { "origem": "name", "destino": "nameFeriado" }
+        ]
       }
     ]
   }

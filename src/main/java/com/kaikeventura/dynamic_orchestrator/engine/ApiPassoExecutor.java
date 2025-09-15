@@ -60,7 +60,7 @@ public class ApiPassoExecutor implements PassoExecutor {
             MediaType contentType = response.getHeaders().getContentType();
             try {
                 if (contentType != null) {
-                    LinkedHashMap responseBody = objectMapper.readValue(response.getBody(), LinkedHashMap.class);
+                    Object responseBody = objectMapper.readValue(response.getBody(), Object.class);
                     if (responseBody != null) {
                         salvarRespostaNoContexto(passo, responseBody, variaveis, contexto);
                     }
@@ -75,7 +75,7 @@ public class ApiPassoExecutor implements PassoExecutor {
 
     private void salvarRespostaNoContexto(
             FluxoConfig.Passo passo,
-            LinkedHashMap<Object, Object> responseBody,
+            Object responseBody,
             List<FluxoConfig.Variavel> variaveis,
             VariavelContexto contexto
     ) {
@@ -96,9 +96,19 @@ public class ApiPassoExecutor implements PassoExecutor {
                     String idPassoReferencia = matcher.group(1);  // ex: passo-consulta-preco-produto
                     String campoResposta = matcher.group(2);      // ex: preco
 
-                    // se for o passo atual e a resposta contém o campo
-                    if (passo.getId().equals(idPassoReferencia) && responseBody.containsKey(campoResposta)) {
-                        contexto.set(var.getId(), responseBody.get(campoResposta));
+                    if (responseBody instanceof LinkedHashMap<?,?>) {
+                        var responseBodyLinkedHashMap = (LinkedHashMap) responseBody;
+
+                        if (passo.getId().equals(idPassoReferencia) && responseBodyLinkedHashMap.containsKey(campoResposta)) {
+                            contexto.set(var.getId(), responseBodyLinkedHashMap.get(campoResposta));
+                        }
+                    }
+
+                    if (responseBody instanceof List<?>) {
+                        var responseBodyList = (List) responseBody;
+                        if (campoResposta.contains("<List>")) {
+                            contexto.set(var.getId(), responseBodyList);
+                        }
                     }
                 }
             }

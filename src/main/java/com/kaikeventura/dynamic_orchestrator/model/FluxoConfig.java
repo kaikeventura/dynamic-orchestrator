@@ -39,12 +39,26 @@ public class FluxoConfig {
     @Data
     public static class Metadados {
         private List<Variavel> variaveis;
+        private List<Estrutura> estruturas;
+        private List<Mapeamento> mapeamentos;
     }
 
     @Data
     public static class Variavel {
         private String id;
         private Origem origem;
+    }
+
+    @Data
+    public static class Estrutura {
+        private String id;
+        private Object valor;
+    }
+
+    @Data
+    public static class Mapeamento {
+        private String id;
+        private Object valor;
     }
 
     @Data
