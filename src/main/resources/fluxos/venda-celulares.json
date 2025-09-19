@@ -1,0 +1,147 @@
+{
+  "fluxo": "venda-celulares",
+  "contrato": {
+    "entrada": [
+      {
+        "id": "id-celular",
+        "nomeCampo": "celularId",
+        "obrigatorio": true
+      },
+      {
+        "id": "id-cartao",
+        "nomeCampo": "cartaoId",
+        "obrigatorio": true
+      }
+    ],
+    "saida": [
+      {
+        "id": "id-transacao",
+        "nomeCampo": "idTransacao",
+        "valor": "{{variaveis$.variavel-id-transacao}}"
+      },
+      {
+        "id": "id-transacao-aprovada",
+        "nomeCampo": "transacaoAprovada",
+        "valor": "{{variaveis$.variavel-transacao-aprovada}}"
+      }
+    ]
+  },
+  "orquestrador": {
+    "passos": [
+      {
+        "ordem": 1,
+        "id": "passo-consulta-preco-celular",
+        "tipo": "DYNAMODB",
+        "integracao": {
+          "nomeTabela": "celulares_tbl",
+          "operacao": "QUERY",
+          "parametrosChave": {
+            "partitionKey": {
+              "id_celular": "{{variaveis$.variavel-id-celular}}"
+            },
+            "sortKey": null
+          },
+          "resultado": {
+            "id_celular": "String",
+            "preco": "Long",
+            "ultima_atualizacao": "String"
+          }
+        }
+      },
+      {
+        "ordem": 2,
+        "id": "passo-efetiva-pagamento",
+        "tipo": "API",
+        "integracao": {
+          "requisicao": {
+            "metodo": "POST",
+            "url": "https://cd3f203a-ab69-4ac7-8e27-69afe26aa144.mock.pstmn.io/sts",
+            "queryParams": null,
+            "headers": {
+              "Content-Type": "json"
+            },
+            "body": {
+              "idDoCelular": "{{variaveis$.variavel-id-celular}}",
+              "idDoCartao": "{{variaveis$.variavel-id-cartao}}",
+              "valor": "{{variaveis$.variavel-preco-celular}}"
+            }
+          },
+          "resposta": {
+            "body": {
+              "idTransacao": "String",
+              "aprovado": "Boolean"
+            }
+          }
+        }
+      },
+      {
+        "ordem": 3,
+        "id": "passo-persiste-transacao",
+        "tipo": "DYNAMODB",
+        "integracao": {
+          "nomeTabela": "transacao_tbl",
+          "operacao": "PERSISTENCY",
+          "parametrosChave": {
+            "partitionKey": {
+              "id_transacao": "{{variaveis$.variavel-id-transacao}}"
+            },
+            "sortKey": {
+              "id_celular": "{{variaveis$.variavel-id-celular}}"
+            }
+          },
+          "campos": [
+            {
+              "preco": "{{variaveis$.variavel-preco-celular}}"
+            },
+            {
+              "id_cartao": "{{variaveis$.variavel-id-cartao}}"
+            },
+            {
+              "aprovado": "{{variaveis$.variavel-transacao-aprovada}}"
+            }
+          ],
+          "resultado": null
+        }
+      }
+    ]
+  },
+  "metadados": {
+    "variaveis": [
+      {
+        "id": "variavel-id-celular",
+        "origem": {
+          "tipoReferencia": "contrato",
+          "idReferencia": "{{entrada$.id-celular}}"
+        }
+      },
+      {
+        "id": "variavel-id-cartao",
+        "origem": {
+          "tipoReferencia": "contrato",
+          "idReferencia": "{{entrada$.id-cartao}}"
+        }
+      },
+      {
+        "id": "variavel-preco-celular",
+        "origem": {
+          "tipoReferencia": "orquestrador",
+          "idReferencia": "{{dynamodb$.passo-consulta-preco-celular$.resultado$.preco}}"
+        }
+      },
+      {
+        "id": "variavel-id-transacao",
+        "origem": {
+          "tipoReferencia": "orquestrador",
+          "idReferencia": "{{api$.passo-efetiva-pagamento$.resposta$.idTransacao}}"
+        }
+      },
+      {
+        "id": "variavel-transacao-aprovada",
+        "origem": {
+          "tipoReferencia": "orquestrador",
+          "idReferencia": "{{api$.passo-efetiva-pagamento$.resposta$.aprovado}}"
+        }
+      }
+    ]
+  }
+}
