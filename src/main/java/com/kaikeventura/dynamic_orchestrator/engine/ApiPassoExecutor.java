@@ -24,8 +24,9 @@ public class ApiPassoExecutor implements PassoExecutor {
     }
 
     @Override
-    public void executarPasso(FluxoConfig.Passo passo, List<FluxoConfig.Variavel> variaveis, VariavelContexto contexto) {
-        FluxoConfig.Requisicao req = passo.getIntegracao().getRequisicao();
+    public void executarPasso(FluxoConfig.PassoBase passo, List<FluxoConfig.Variavel> variaveis, VariavelContexto contexto) {
+        var passoAPI = (FluxoConfig.PassoAPI) passo;
+        FluxoConfig.Requisicao req = passoAPI.getIntegracao().getRequisicao();
 
         Map<String, Object> headersMap = VariavelSubstituidor.substituir(req.getHeaders(), contexto);
         Map<String, Object> queryParams = VariavelSubstituidor.substituir(req.getQueryParams(), contexto);
@@ -62,7 +63,7 @@ public class ApiPassoExecutor implements PassoExecutor {
                 if (contentType != null) {
                     LinkedHashMap responseBody = objectMapper.readValue(response.getBody(), LinkedHashMap.class);
                     if (responseBody != null) {
-                        salvarRespostaNoContexto(passo, responseBody, variaveis, contexto);
+                        salvarRespostaNoContexto(passoAPI, responseBody, variaveis, contexto);
                     }
                 } else {
                     contexto.set(passo.getId(), response.getBody());
@@ -74,7 +75,7 @@ public class ApiPassoExecutor implements PassoExecutor {
     }
 
     private void salvarRespostaNoContexto(
-            FluxoConfig.Passo passo,
+            FluxoConfig.PassoAPI passo,
             LinkedHashMap<Object, Object> responseBody,
             List<FluxoConfig.Variavel> variaveis,
             VariavelContexto contexto

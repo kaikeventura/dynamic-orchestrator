@@ -1,7 +1,10 @@
 package com.kaikeventura.dynamic_orchestrator.model;
 
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
@@ -57,19 +60,34 @@ public class FluxoConfig {
 
     @Data
     public static class Orquestrador {
-        private List<Passo> passos;
+        private List<PassoBase> passos;
     }
 
     @Data
-    public static class Passo {
+    @JsonTypeInfo(
+            use = JsonTypeInfo.Id.NAME,
+            include = JsonTypeInfo.As.PROPERTY,
+            property = "tipo",
+            visible = true
+    )
+    @JsonSubTypes({
+            @JsonSubTypes.Type(value = PassoAPI.class, name = "API"),
+            @JsonSubTypes.Type(value = PassoDynamoDB.class, name = "DYNAMODB")
+    })
+    public static abstract class PassoBase {
         private String id;
         private String tipo;
         private int ordem;
-        private Integracao integracao;
+    }
+
+    @EqualsAndHashCode(callSuper = true)
+    @Data
+    public static class PassoAPI extends PassoBase {
+        private IntegracaoAPI integracao;
     }
 
     @Data
-    public static class Integracao {
+    public static class IntegracaoAPI {
         private Requisicao requisicao;
         private Resposta resposta;
     }
@@ -86,5 +104,30 @@ public class FluxoConfig {
     @Data
     public static class Resposta {
         private Object body;
+    }
+
+    @EqualsAndHashCode(callSuper = true)
+    @Data
+    public static class PassoDynamoDB extends PassoBase {
+        private IntegracaoDynamoDB integracao;
+    }
+
+    @Data
+    public static class IntegracaoDynamoDB {
+        private String nomeTabela;
+        private OperacaoDynamoDB operacao;
+        private ParametrosChaveDynamoDB parametrosChave;
+        private List<Map<String, Object>> campos;
+        private Object resultado;
+    }
+
+    public enum OperacaoDynamoDB {
+        QUERY, PERSISTENCY
+    }
+
+    @Data
+    public static class ParametrosChaveDynamoDB {
+        private Map<String, Object> partitionKey;
+        private Map<String, Object> sortKey;
     }
 }

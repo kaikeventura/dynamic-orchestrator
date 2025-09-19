@@ -6,5 +6,5 @@ import java.util.List;
 
 public interface PassoExecutor {
     boolean suporta(String tipo);
-    void executarPasso(FluxoConfig.Passo passo, List<FluxoConfig.Variavel> variaveis, VariavelContexto contexto) throws Exception;
+    void executarPasso(FluxoConfig.PassoBase passo, List<FluxoConfig.Variavel> variaveis, VariavelContexto contexto) throws Exception;
 }

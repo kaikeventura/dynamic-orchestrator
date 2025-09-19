@@ -28,19 +28,20 @@ public class DynamoDbPassoExecutor implements PassoExecutor {
     }
 
     @Override
-    public void executarPasso(FluxoConfig.Passo passo, List<FluxoConfig.Variavel> variaveis, VariavelContexto contexto) {
-        Map<String, Object> integracaoMap = objectMapper.convertValue(passo.getIntegracao(), Map.class);
+    public void executarPasso(FluxoConfig.PassoBase passo, List<FluxoConfig.Variavel> variaveis, VariavelContexto contexto) {
+        var passoDynamoDB = (FluxoConfig.PassoDynamoDB) passo;
+        Map<String, Object> integracaoMap = objectMapper.convertValue(passoDynamoDB.getIntegracao(), Map.class);
         String operacao = (String) integracaoMap.get("operacao");
 
         if ("QUERY".equalsIgnoreCase(operacao)) {
-            executarQuery(passo, integracaoMap, variaveis, contexto);
+            executarQuery(passoDynamoDB, integracaoMap, variaveis, contexto);
         } else if ("PERSISTENCY".equalsIgnoreCase(operacao)) {
-            executarPersistencia(passo, integracaoMap, contexto);
+            executarPersistencia(passoDynamoDB, integracaoMap, contexto);
         }
     }
 
     private void executarQuery(
-            FluxoConfig.Passo passo,
+            FluxoConfig.PassoDynamoDB passo,
             Map<String, Object> integracaoMap,
             List<FluxoConfig.Variavel> variaveis,
             VariavelContexto contexto
@@ -74,7 +75,7 @@ public class DynamoDbPassoExecutor implements PassoExecutor {
     }
 
     private void executarPersistencia(
-            FluxoConfig.Passo passo,
+            FluxoConfig.PassoDynamoDB passo,
             Map<String, Object> integracaoMap,
             VariavelContexto contexto
     ) {
@@ -107,7 +108,7 @@ public class DynamoDbPassoExecutor implements PassoExecutor {
     }
 
     private void salvarResultadoNoContexto(
-            FluxoConfig.Passo passo,
+            FluxoConfig.PassoDynamoDB passo,
             Map<String, Object> resultado,
             List<FluxoConfig.Variavel> variaveis,
             VariavelContexto contexto

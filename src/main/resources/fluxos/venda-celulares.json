@@ -55,10 +55,10 @@
         "integracao": {
           "requisicao": {
             "metodo": "POST",
-            "url": "https://4368e346-0b30-49f4-b72e-5b405ece4dab.mock.pstmn.io/transactions",
+            "url": "https://68cdd728da4697a7f3070dff.mockapi.io/api/transactions",
             "queryParams": null,
             "headers": {
-              "Content-Type": "json"
+              "Content-Type": "application/json"
             },
             "body": {
               "idDoCelular": "{{variaveis$.variavel-id-celular}}",

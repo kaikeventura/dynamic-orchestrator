@@ -1,12 +1,15 @@
 package com.kaikeventura.dynamic_orchestrator.engine;
 
+import com.kaikeventura.dynamic_orchestrator.model.FluxoConfig;
 import com.kaikeventura.dynamic_orchestrator.transform.ExpressaoJavaExecutor;
 import com.kaikeventura.dynamic_orchestrator.validador.ValidadorContrato;
-import com.kaikeventura.dynamic_orchestrator.model.FluxoConfig;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
@@ -24,7 +27,7 @@ public class FluxoEngine {
 
         List<FluxoConfig.Variavel> variaveis = config.getMetadados().getVariaveis();
         config.getOrquestrador().getPassos().stream()
-                .sorted(Comparator.comparingInt(FluxoConfig.Passo::getOrdem))
+                .sorted(Comparator.comparingInt(FluxoConfig.PassoBase::getOrdem))
                 .forEach(passo -> executarPasso(passo, variaveis, contexto));
 
         return montarSaida(config, contexto);
@@ -51,7 +54,7 @@ public class FluxoEngine {
         }
     }
 
-    private void executarPasso(FluxoConfig.Passo passo, List<FluxoConfig.Variavel> variaveis, VariavelContexto contexto) {
+    private void executarPasso(FluxoConfig.PassoBase passo, List<FluxoConfig.Variavel> variaveis, VariavelContexto contexto) {
         try {
             PassoExecutor executor = executorFactory.getExecutor(passo.getTipo());
             executor.executarPasso(passo, variaveis, contexto);
