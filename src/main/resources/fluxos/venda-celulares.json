@@ -55,7 +55,7 @@
         "integracao": {
           "requisicao": {
             "metodo": "POST",
-            "url": "https://cd3f203a-ab69-4ac7-8e27-69afe26aa144.mock.pstmn.io/sts",
+            "url": "https://4368e346-0b30-49f4-b72e-5b405ece4dab.mock.pstmn.io/transactions",
             "queryParams": null,
             "headers": {
               "Content-Type": "json"
