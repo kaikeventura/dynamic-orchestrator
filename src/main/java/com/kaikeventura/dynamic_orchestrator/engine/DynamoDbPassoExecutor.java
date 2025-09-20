@@ -8,14 +8,13 @@ import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 import software.amazon.awssdk.services.dynamodb.model.PutItemRequest;
 import software.amazon.awssdk.services.dynamodb.model.QueryRequest;
-import software.amazon.awssdk.services.dynamodb.model.QueryResponse;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-@Component("DYNAMODB")
+@Component
 @RequiredArgsConstructor
 public class DynamoDbPassoExecutor implements PassoExecutor {
 
@@ -54,7 +53,6 @@ public class DynamoDbPassoExecutor implements PassoExecutor {
         var partitionKeyName = resolvedPartitionKey.keySet().iterator().next();
         var partitionKeyValue = resolvedPartitionKey.get(partitionKeyName);
 
-
         var keyConditionExpression = String.format("%s = :val1", partitionKeyName);
         var expressionAttributeValues = new HashMap<>(Map.of(
                 ":val1", toAttributeValue(partitionKeyValue)
@@ -71,13 +69,13 @@ public class DynamoDbPassoExecutor implements PassoExecutor {
             expressionAttributeValues.put(":val2", toAttributeValue(sortKeyValue));
         }
 
-        QueryRequest queryRequest = QueryRequest.builder()
+        var queryRequest = QueryRequest.builder()
                 .tableName(nomeTabela)
                 .keyConditionExpression(keyConditionExpression)
                 .expressionAttributeValues(expressionAttributeValues)
                 .build();
 
-        QueryResponse response = dynamoDbClient.query(queryRequest);
+        var response = dynamoDbClient.query(queryRequest);
 
         if (response.hasItems() && !response.items().isEmpty()) {
             Map<String, AttributeValue> item = response.items().getFirst();
@@ -90,27 +88,28 @@ public class DynamoDbPassoExecutor implements PassoExecutor {
             FluxoConfig.IntegracaoDynamoDB integracao,
             VariavelContexto contexto
     ) {
-        String nomeTabela = (String) integracaoMap.get("nomeTabela");
-        Map<String, Object> parametrosChave = (Map<String, Object>) integracaoMap.get("parametrosChave");
-        List<Map<String, Object>> campos = (List<Map<String, Object>>) integracaoMap.get("campos");
+        var nomeTabela = integracao.getNomeTabela();
+        var parametrosChave = integracao.getParametrosChave();
+        var partitionKey = parametrosChave.getPartitionKey();
 
-        Map<String, Object> itemParaPersistir = new HashMap<>();
+        var itemParaPersistir = new HashMap<>(VariavelSubstituidor.substituir(partitionKey, contexto));
 
-        Map<String, Object> partitionKey = (Map<String, Object>) parametrosChave.get("partitionKey");
-        itemParaPersistir.putAll(VariavelSubstituidor.substituir(partitionKey, contexto));
+        var sortKey = parametrosChave.getSortKey();
+        var resolvedSortKey = VariavelSubstituidor.substituir(sortKey, contexto);
 
-        if (parametrosChave.get("sortKey") != null) {
-            Map<String, Object> sortKey = (Map<String, Object>) parametrosChave.get("sortKey");
+        if (!resolvedSortKey.isEmpty()) {
             itemParaPersistir.putAll(VariavelSubstituidor.substituir(sortKey, contexto));
         }
 
+        var campos = integracao.getCampos();
+
         if (campos != null) {
-            for (Map<String, Object> campo : campos) {
+            for (var campo : campos) {
                 itemParaPersistir.putAll(VariavelSubstituidor.substituir(campo, contexto));
             }
         }
 
-        PutItemRequest putItemRequest = PutItemRequest.builder()
+        var putItemRequest = PutItemRequest.builder()
                 .tableName(nomeTabela)
                 .item(toAttributeValueMap(itemParaPersistir))
                 .build();
@@ -124,18 +123,18 @@ public class DynamoDbPassoExecutor implements PassoExecutor {
             List<FluxoConfig.Variavel> variaveis,
             VariavelContexto contexto
     ) {
-        for (FluxoConfig.Variavel var : variaveis) {
-            if ("orquestrador".equals(var.getOrigem().getTipoReferencia())) {
-                String idReferencia = var.getOrigem().getIdReferencia();
-                String pattern = "\\{\\{dynamodb\\$\\.(.+?)\\$\\.resultado\\$\\.(.+?)}}";
-                java.util.regex.Matcher matcher = java.util.regex.Pattern.compile(pattern).matcher(idReferencia);
+        for (var variavel : variaveis) {
+            if ("orquestrador".equals(variavel.getOrigem().getTipoReferencia())) {
+                var idReferencia = variavel.getOrigem().getIdReferencia();
+                var pattern = "\\{\\{dynamodb\\$\\.(.+?)\\$\\.resultado\\$\\.(.+?)}}";
+                var matcher = java.util.regex.Pattern.compile(pattern).matcher(idReferencia);
 
                 if (matcher.matches()) {
                     String idPassoReferencia = matcher.group(1);
                     String campoResultado = matcher.group(2);
 
                     if (passo.getId().equals(idPassoReferencia) && resultado.containsKey(campoResultado)) {
-                        contexto.set(var.getId(), resultado.get(campoResultado));
+                        contexto.set(variavel.getId(), resultado.get(campoResultado));
                     }
                 }
             }
@@ -149,7 +148,7 @@ public class DynamoDbPassoExecutor implements PassoExecutor {
 
     private Object fromAttributeValue(AttributeValue val) {
         if (val.s() != null) return val.s();
-        if (val.n() != null) return Long.parseLong(val.n()); // Simplificado para Long
+        if (val.n() != null) return Long.parseLong(val.n());
         if (val.bool() != null) return val.bool();
         if (val.hasM()) return fromAttributeValueMap(val.m());
         return null;
@@ -171,7 +170,6 @@ public class DynamoDbPassoExecutor implements PassoExecutor {
             return AttributeValue.builder().bool((Boolean) value).build();
         }
         if (value instanceof Map) {
-            //noinspection unchecked
             return AttributeValue.builder().m(toAttributeValueMap((Map<String, Object>) value)).build();
         }
         return AttributeValue.builder().nul(true).build();
