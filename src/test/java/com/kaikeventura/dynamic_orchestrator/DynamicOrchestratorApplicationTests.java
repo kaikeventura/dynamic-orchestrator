@@ -22,11 +22,11 @@ class DynamicOrchestratorApplicationTests {
     void deveExecutarFluxoProdutosEletronicos() throws Exception {
         String requestBody = """
             {
-              "fluxo": "produtos-eletronicos",
-              "dadosEntrada": {
-                "produtoId": "12345",
-                "produtoQuantidade": "10"
-              }
+                "fluxo": "produtos-eletronicos",
+                "dadosEntrada": {
+                    "produtoId": "12345",
+                    "produtoQuantidade": "10"
+                }
             }
             """;
 
@@ -36,5 +36,25 @@ class DynamicOrchestratorApplicationTests {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.valorProduto").exists())
                 .andExpect(jsonPath("$.valorProduto").isNotEmpty());
+    }
+
+    @Test
+    void deveExecutarFluxoVendaCelulares() throws Exception {
+        String requestBody = """
+            {
+                "fluxo": "venda-celulares",
+                "dadosEntrada": {
+                    "celularId": "123",
+                    "cartaoId": "321"
+                }
+            }
+            """;
+
+        mockMvc.perform(post("/fluxos/executar")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.idTransacao").exists())
+                .andExpect(jsonPath("$.transacaoAprovada").exists());
     }
 }
