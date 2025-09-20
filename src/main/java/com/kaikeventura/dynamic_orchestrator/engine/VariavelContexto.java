@@ -13,12 +13,4 @@ public class VariavelContexto {
     public Object get(String chave) {
         return valores.get(chave);
     }
-
-    public boolean contem(String chave) {
-        return valores.containsKey(chave);
-    }
-
-    public Map<String, Object> todas() {
-        return Map.copyOf(valores);
-    }
 }

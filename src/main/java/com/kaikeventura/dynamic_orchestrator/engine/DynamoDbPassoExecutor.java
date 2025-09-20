@@ -30,34 +30,46 @@ public class DynamoDbPassoExecutor implements PassoExecutor {
     @Override
     public void executarPasso(FluxoConfig.PassoBase passo, List<FluxoConfig.Variavel> variaveis, VariavelContexto contexto) {
         var passoDynamoDB = (FluxoConfig.PassoDynamoDB) passo;
-        Map<String, Object> integracaoMap = objectMapper.convertValue(passoDynamoDB.getIntegracao(), Map.class);
-        String operacao = (String) integracaoMap.get("operacao");
+        var integracao = passoDynamoDB.getIntegracao();
+        String operacao = integracao.getOperacao().name();
 
         if ("QUERY".equalsIgnoreCase(operacao)) {
-            executarQuery(passoDynamoDB, integracaoMap, variaveis, contexto);
+            executarQuery(passoDynamoDB, integracao, variaveis, contexto);
         } else if ("PERSISTENCY".equalsIgnoreCase(operacao)) {
-            executarPersistencia(passoDynamoDB, integracaoMap, contexto);
+            executarPersistencia(integracao, contexto);
         }
     }
 
     private void executarQuery(
             FluxoConfig.PassoDynamoDB passo,
-            Map<String, Object> integracaoMap,
+            FluxoConfig.IntegracaoDynamoDB integracao,
             List<FluxoConfig.Variavel> variaveis,
             VariavelContexto contexto
     ) {
-        String nomeTabela = (String) integracaoMap.get("nomeTabela");
-        Map<String, Object> parametrosChave = (Map<String, Object>) integracaoMap.get("parametrosChave");
-        Map<String, Object> partitionKey = (Map<String, Object>) parametrosChave.get("partitionKey");
-        Map<String, Object> resolvedPartitionKey = VariavelSubstituidor.substituir(partitionKey, contexto);
+        var nomeTabela = integracao.getNomeTabela();
+        var parametrosChave = integracao.getParametrosChave();
+        var partitionKey = parametrosChave.getPartitionKey();
+        var resolvedPartitionKey = VariavelSubstituidor.substituir(partitionKey, contexto);
 
-        String keyName = resolvedPartitionKey.keySet().iterator().next();
-        Object keyValue = resolvedPartitionKey.get(keyName);
+        var partitionKeyName = resolvedPartitionKey.keySet().iterator().next();
+        var partitionKeyValue = resolvedPartitionKey.get(partitionKeyName);
 
-        String keyConditionExpression = String.format("%s = :val", keyName);
-        Map<String, AttributeValue> expressionAttributeValues = Map.of(
-                ":val", toAttributeValue(keyValue)
-        );
+
+        var keyConditionExpression = String.format("%s = :val1", partitionKeyName);
+        var expressionAttributeValues = new HashMap<>(Map.of(
+                ":val1", toAttributeValue(partitionKeyValue)
+        ));
+
+        var sortKey = parametrosChave.getSortKey();
+        var resolvedSortKey = VariavelSubstituidor.substituir(sortKey, contexto);
+
+        if (!resolvedSortKey.isEmpty()) {
+            var sortKeyName = resolvedSortKey.keySet().iterator().next();
+            var sortKeyValue = resolvedSortKey.get(partitionKeyName);
+
+            keyConditionExpression = String.join(keyConditionExpression, String.format(", %s = :val2", sortKeyName));
+            expressionAttributeValues.put(":val2", toAttributeValue(sortKeyValue));
+        }
 
         QueryRequest queryRequest = QueryRequest.builder()
                 .tableName(nomeTabela)
@@ -68,15 +80,14 @@ public class DynamoDbPassoExecutor implements PassoExecutor {
         QueryResponse response = dynamoDbClient.query(queryRequest);
 
         if (response.hasItems() && !response.items().isEmpty()) {
-            Map<String, AttributeValue> item = response.items().get(0);
+            Map<String, AttributeValue> item = response.items().getFirst();
             Map<String, Object> resultado = fromAttributeValueMap(item);
             salvarResultadoNoContexto(passo, resultado, variaveis, contexto);
         }
     }
 
     private void executarPersistencia(
-            FluxoConfig.PassoDynamoDB passo,
-            Map<String, Object> integracaoMap,
+            FluxoConfig.IntegracaoDynamoDB integracao,
             VariavelContexto contexto
     ) {
         String nomeTabela = (String) integracaoMap.get("nomeTabela");
