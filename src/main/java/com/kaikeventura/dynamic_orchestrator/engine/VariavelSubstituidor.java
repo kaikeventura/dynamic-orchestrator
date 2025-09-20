@@ -35,7 +35,7 @@ public class VariavelSubstituidor {
         for (var variavelBase : variaveisBase) {
             var variavelChave = variavelBase.replace("{{", "").replace("}}", "");
             var variavelNome = variavelChave.replace("variaveis$.", "");
-            valorTranformado = original.replace(variavelBase, contexto.get(variavelNome).toString());
+            valorTranformado = valorTranformado.replace(variavelBase, contexto.get(variavelNome).toString());
         }
 
         return valorTranformado;

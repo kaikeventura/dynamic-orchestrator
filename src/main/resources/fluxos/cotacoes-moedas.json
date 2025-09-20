@@ -14,7 +14,11 @@
       }
     ],
     "saida": [
-
+      {
+        "id": "lista-cotacoes",
+        "nomeCampo": "cotacoes",
+        "valor": "{{java(transformadorListaObjetos({{variaveis$.variavel-lista-cotacoes}}, {{mapeamentos$.mapeamento-cotacoes}}))}}"
+      }
     ]
   },
   "orquestrador": {
@@ -26,21 +30,27 @@
         "integracao": {
           "requisicao": {
             "metodo": "GET",
-            "url": "https://brasilapi.com.br/api/cambio/v1/cotacao/{{USD}}/{{2025-09-18}}",
+            "url": "https://brasilapi.com.br/api/cambio/v1/cotacao/{{variaveis$.variavel-nome-moeda}}/{{variaveis$.variavel-data-referencia-cotacao}}",
             "queryParams": null,
             "headers": {
               "Content-Type": "application/json"
             },
-            "body": {
-              "idDoCelular": "{{variaveis$.variavel-id-celular}}",
-              "idDoCartao": "{{variaveis$.variavel-id-cartao}}",
-              "valor": "{{variaveis$.variavel-preco-celular}}"
-            }
+            "body": null
           },
           "resposta": {
             "body": {
-              "idTransacao": "String",
-              "aprovado": "Boolean"
+              "cotacoes": [
+                {
+                  "paridade_compra": "Integer",
+                  "paridade_venda": "Integer",
+                  "cotacao_compra": "BigDecimal",
+                  "cotacao_venda": "BigDecimal",
+                  "data_hora_cotacao": "String",
+                  "tipo_boletim": "String"
+                }
+              ],
+              "moeda": "String",
+              "data": "String"
             }
           }
         }
@@ -50,25 +60,40 @@
   "metadados": {
     "variaveis": [
       {
-        "id": "variavel-id-celular",
+        "id": "variavel-nome-moeda",
         "origem": {
           "tipoReferencia": "contrato",
-          "idReferencia": "{{entrada$.id-celular}}"
+          "idReferencia": "{{entrada$.id-nome-moeda}}"
         }
       },
       {
-        "id": "variavel-id-cartao",
+        "id": "variavel-data-referencia-cotacao",
         "origem": {
           "tipoReferencia": "contrato",
-          "idReferencia": "{{entrada$.id-cartao}}"
+          "idReferencia": "{{entrada$.id-data-referencia-cotacao}}"
         }
       },
       {
-        "id": "variavel-preco-celular",
+        "id": "variavel-lista-cotacoes",
         "origem": {
           "tipoReferencia": "orquestrador",
-          "idReferencia": "{{dynamodb$.passo-consulta-preco-celular$.resultado$.preco}}"
+          "idReferencia": "{{api.passo-consulta-cotacao-moeda$.resultado$.cotacoes}}"
         }
+      }
+    ],
+    "mapeamentos": [
+      {
+        "id": "mapeamento-cotacoes",
+        "campos": [
+          {
+            "origem": "paridade_compra",
+            "destino": "paridadeCompra"
+          },
+          {
+            "origem": "paridade_venda",
+            "destino": "paridadeVenda"
+          }
+        ]
       }
     ]
   }
