@@ -1,0 +1,75 @@
+{
+  "fluxo": "cotacoes-moedas",
+  "contrato": {
+    "entrada": [
+      {
+        "id": "id-nome-moeda",
+        "nomeCampo": "nomeMoeda",
+        "obrigatorio": true
+      },
+      {
+        "id": "id-data-referencia-cotacao",
+        "nomeCampo": "dataReferenciaCotacao",
+        "obrigatorio": true
+      }
+    ],
+    "saida": [
+
+    ]
+  },
+  "orquestrador": {
+    "passos": [
+      {
+        "ordem": 1,
+        "id": "passo-consulta-cotacao-moeda",
+        "tipo": "API",
+        "integracao": {
+          "requisicao": {
+            "metodo": "GET",
+            "url": "https://brasilapi.com.br/api/cambio/v1/cotacao/{{USD}}/{{2025-09-18}}",
+            "queryParams": null,
+            "headers": {
+              "Content-Type": "application/json"
+            },
+            "body": {
+              "idDoCelular": "{{variaveis$.variavel-id-celular}}",
+              "idDoCartao": "{{variaveis$.variavel-id-cartao}}",
+              "valor": "{{variaveis$.variavel-preco-celular}}"
+            }
+          },
+          "resposta": {
+            "body": {
+              "idTransacao": "String",
+              "aprovado": "Boolean"
+            }
+          }
+        }
+      }
+    ]
+  },
+  "metadados": {
+    "variaveis": [
+      {
+        "id": "variavel-id-celular",
+        "origem": {
+          "tipoReferencia": "contrato",
+          "idReferencia": "{{entrada$.id-celular}}"
+        }
+      },
+      {
+        "id": "variavel-id-cartao",
+        "origem": {
+          "tipoReferencia": "contrato",
+          "idReferencia": "{{entrada$.id-cartao}}"
+        }
+      },
+      {
+        "id": "variavel-preco-celular",
+        "origem": {
+          "tipoReferencia": "orquestrador",
+          "idReferencia": "{{dynamodb$.passo-consulta-preco-celular$.resultado$.preco}}"
+        }
+      }
+    ]
+  }
+}
