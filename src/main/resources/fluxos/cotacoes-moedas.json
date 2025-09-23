@@ -77,7 +77,7 @@
         "id": "variavel-lista-cotacoes",
         "origem": {
           "tipoReferencia": "orquestrador",
-          "idReferencia": "{{api.passo-consulta-cotacao-moeda$.resultado$.cotacoes}}"
+          "idReferencia": "{{api$.passo-consulta-cotacao-moeda$.resposta$.cotacoes}}"
         }
       }
     ],
