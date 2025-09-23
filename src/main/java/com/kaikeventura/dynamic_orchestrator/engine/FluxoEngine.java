@@ -71,7 +71,7 @@ public class FluxoEngine {
                 String varId = valor.replace("{{variaveis$.", "").replace("}}", "");
                 saida.put(campoSaida.getNomeCampo(), contexto.get(varId));
             } else {
-                saida.put(campoSaida.getNomeCampo(), expressaoJavaExecutor.executar(valor, contexto));
+                saida.put(campoSaida.getNomeCampo(), expressaoJavaExecutor.executar(valor, config, contexto));
             }
         }
         return saida;

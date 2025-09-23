@@ -37,7 +37,7 @@ class ExpressaoJavaExecutorTest {
         String expressao = "{{java(soma(var1, 10))}}";
         String[] params = {"var1", "10"};
         when(factory.getTransformador("soma")).thenReturn(transformador);
-        when(transformador.transformar(params, contexto)).thenReturn(25);
+        when(transformador.transformar(TransformadorRequest)).thenReturn(25);
 
         // When
         Object resultado = expressaoJavaExecutor.executar(expressao, contexto);
@@ -45,7 +45,7 @@ class ExpressaoJavaExecutorTest {
         // Then
         assertEquals(25, resultado);
         verify(factory).getTransformador("soma");
-        verify(transformador).transformar(params, contexto);
+        verify(transformador).transformar(TransformadorRequest);
     }
 
     @Test
@@ -77,7 +77,7 @@ class ExpressaoJavaExecutorTest {
         String expressao = "{{java(  soma  (  var1  ,  10  )  )}}";
         String[] params = {"var1", "10"};
         when(factory.getTransformador("soma")).thenReturn(transformador);
-        when(transformador.transformar(params, contexto)).thenReturn(25);
+        when(transformador.transformar(TransformadorRequest)).thenReturn(25);
 
         // When
         Object resultado = expressaoJavaExecutor.executar(expressao, contexto);
@@ -92,7 +92,7 @@ class ExpressaoJavaExecutorTest {
         String expressao = "{{java(agora())}}";
         String[] params = {""};
         when(factory.getTransformador("agora")).thenReturn(transformador);
-        when(transformador.transformar(params, contexto)).thenReturn("2023-10-27");
+        when(transformador.transformar(TransformadorRequest)).thenReturn("2023-10-27");
 
         // When
         Object resultado = expressaoJavaExecutor.executar(expressao, contexto);
@@ -100,6 +100,6 @@ class ExpressaoJavaExecutorTest {
         // Then
         assertEquals("2023-10-27", resultado);
         verify(factory).getTransformador("agora");
-        verify(transformador).transformar(params, contexto);
+        verify(transformador).transformar(TransformadorRequest);
     }
 }

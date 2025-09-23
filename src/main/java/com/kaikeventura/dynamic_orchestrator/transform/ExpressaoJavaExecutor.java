@@ -1,6 +1,7 @@
 package com.kaikeventura.dynamic_orchestrator.transform;
 
 import com.kaikeventura.dynamic_orchestrator.engine.VariavelContexto;
+import com.kaikeventura.dynamic_orchestrator.model.FluxoConfig;
 import org.springframework.stereotype.Component;
 
 import java.util.regex.Matcher;
@@ -17,7 +18,7 @@ public class ExpressaoJavaExecutor {
         this.factory = factory;
     }
 
-    public Object executar(String expressao, VariavelContexto contexto) {
+    public Object executar(String expressao, FluxoConfig config, VariavelContexto contexto) {
         Matcher matcher = JAVA_PATTERN.matcher(expressao);
         if (!matcher.matches()) {
             return expressao;
@@ -30,6 +31,6 @@ public class ExpressaoJavaExecutor {
         String[] parametros = paramsStr.split("\\s*,\\s*");
 
         Transformador transformador = factory.getTransformador(nomeTransformador);
-        return transformador.transformar(parametros, contexto);
+        return transformador.transformar(new TransformadorRequest(parametros, config, contexto));
     }
 }

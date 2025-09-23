@@ -32,7 +32,7 @@ class TransformadorLongParaBigDecimalTest {
         String[] params = {"variaveis$.valorProduto", "2"};
 
         // When
-        Object resultado = transformador.transformar(params, contexto);
+        Object resultado = transformador.transformar(TransformadorRequest);
 
         // Then
         assertEquals(new BigDecimal("123.45"), resultado);
@@ -45,7 +45,7 @@ class TransformadorLongParaBigDecimalTest {
         String[] params = {"valorProduto", "3"};
 
         // When
-        Object resultado = transformador.transformar(params, contexto);
+        Object resultado = transformador.transformar(TransformadorRequest);
 
         // Then
         assertEquals(new BigDecimal("10.000"), resultado);
@@ -58,7 +58,7 @@ class TransformadorLongParaBigDecimalTest {
         String[] params = {"valorProduto", "2"};
 
         // When
-        Object resultado = transformador.transformar(params, contexto);
+        Object resultado = transformador.transformar(TransformadorRequest);
 
         // Then
         assertEquals(new BigDecimal("0.01"), resultado);
@@ -71,7 +71,7 @@ class TransformadorLongParaBigDecimalTest {
         String[] params = {"valorProduto", "3"};
 
         // When
-        Object resultado = transformador.transformar(params, contexto);
+        Object resultado = transformador.transformar(TransformadorRequest);
 
         // Then
         assertEquals(new BigDecimal("0.001"), resultado);
@@ -83,7 +83,7 @@ class TransformadorLongParaBigDecimalTest {
         String[] params = {"variaveis$.valorProduto"};
 
         // When & Then
-        assertThrows(IllegalArgumentException.class, () -> transformador.transformar(params, contexto));
+        assertThrows(IllegalArgumentException.class, () -> transformador.transformar(TransformadorRequest));
     }
 
     @Test
@@ -93,7 +93,7 @@ class TransformadorLongParaBigDecimalTest {
         String[] params = {"variaveis$.valorProduto", "2"};
 
         // When & Then
-        assertThrows(IllegalArgumentException.class, () -> transformador.transformar(params, contexto));
+        assertThrows(IllegalArgumentException.class, () -> transformador.transformar(TransformadorRequest));
     }
 
     @Test
@@ -102,7 +102,7 @@ class TransformadorLongParaBigDecimalTest {
         String[] params = {"variaveis$.variavelInexistente", "2"};
 
         // When & Then
-        assertThrows(IllegalArgumentException.class, () -> transformador.transformar(params, contexto));
+        assertThrows(IllegalArgumentException.class, () -> transformador.transformar(TransformadorRequest));
     }
 
     @Test
@@ -112,7 +112,7 @@ class TransformadorLongParaBigDecimalTest {
         String[] params = {"  variaveis$.valorProduto  ", "  2  "};
 
         // When
-        Object resultado = transformador.transformar(params, contexto);
+        Object resultado = transformador.transformar(TransformadorRequest);
 
         // Then
         assertEquals(new BigDecimal("123.45"), resultado);
@@ -125,7 +125,7 @@ class TransformadorLongParaBigDecimalTest {
         String[] params = {"valorProduto", "2"};
 
         // When
-        Object resultado = transformador.transformar(params, contexto);
+        Object resultado = transformador.transformar(TransformadorRequest);
 
         // Then
         assertEquals(new BigDecimal("123.45"), resultado);

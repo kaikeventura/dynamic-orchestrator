@@ -1,6 +1,5 @@
 package com.kaikeventura.dynamic_orchestrator.transform;
 
-import com.kaikeventura.dynamic_orchestrator.engine.VariavelContexto;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -15,7 +14,10 @@ public class TransformadorLongParaBigDecimal implements Transformador {
     }
 
     @Override
-    public Object transformar(String[] parametros, VariavelContexto contexto) {
+    public Object transformar(TransformadorRequest request) {
+        var parametros = request.parametros();
+        var contexto = request.contexto();
+
         if (parametros.length != 2) {
             throw new IllegalArgumentException("Parâmetros inválidos para transformadorLongParaBigDecimal");
         }
