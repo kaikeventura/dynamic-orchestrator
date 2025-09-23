@@ -92,6 +92,22 @@
           {
             "origem": "paridade_venda",
             "destino": "paridadeVenda"
+          },
+          {
+            "origem": "cotacao_compra",
+            "destino": "cotacaoCompra"
+          },
+          {
+            "origem": "cotacao_venda",
+            "destino": "cotacaoVenda"
+          },
+          {
+            "origem": "data_hora_cotacao",
+            "destino": "dataHoraCotacao"
+          },
+          {
+            "origem": "tipo_boletim",
+            "destino": "tipoBoletim"
           }
         ]
       }

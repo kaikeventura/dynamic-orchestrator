@@ -67,11 +67,11 @@ public class FluxoEngine {
         Map<String, Object> saida = new HashMap<>();
         for (FluxoConfig.CampoContratoSaida campoSaida : config.getContrato().getSaida()) {
             String valor = campoSaida.getValor();
-            if (valor.contains("{{variaveis$.")) {
+            if (valor.contains("{{java")) {
+                saida.put(campoSaida.getNomeCampo(), expressaoJavaExecutor.executar(valor, config, contexto));
+            } else {
                 String varId = valor.replace("{{variaveis$.", "").replace("}}", "");
                 saida.put(campoSaida.getNomeCampo(), contexto.get(varId));
-            } else {
-                saida.put(campoSaida.getNomeCampo(), expressaoJavaExecutor.executar(valor, config, contexto));
             }
         }
         return saida;
