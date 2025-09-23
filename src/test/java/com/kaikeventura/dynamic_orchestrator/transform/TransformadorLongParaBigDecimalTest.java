@@ -29,10 +29,10 @@ class TransformadorLongParaBigDecimalTest {
     void deveTransformarLongParaBigDecimalComSucesso() {
         // Given
         contexto.set("valorProduto", 12345L);
-        String[] params = {"variaveis$.valorProduto", "2"};
+        var request = new TransformadorRequest(new String[]{"variaveis$.valorProduto", "2"}, null, contexto);
 
         // When
-        Object resultado = transformador.transformar(TransformadorRequest);
+        Object resultado = transformador.transformar(request);
 
         // Then
         assertEquals(new BigDecimal("123.45"), resultado);
@@ -42,10 +42,10 @@ class TransformadorLongParaBigDecimalTest {
     void deveTransformarComTresCasasDecimais() {
         // Given
         contexto.set("valorProduto", 10000L);
-        String[] params = {"valorProduto", "3"};
+        var request = new TransformadorRequest(new String[]{"valorProduto", "3"}, null, contexto);
 
         // When
-        Object resultado = transformador.transformar(TransformadorRequest);
+        Object resultado = transformador.transformar(request);
 
         // Then
         assertEquals(new BigDecimal("10.000"), resultado);
@@ -55,10 +55,10 @@ class TransformadorLongParaBigDecimalTest {
     void deveTransformarUnidadeParaDecimal() {
         // Given
         contexto.set("valorProduto", 1L);
-        String[] params = {"valorProduto", "2"};
+        var request = new TransformadorRequest(new String[]{"valorProduto", "2"}, null, contexto);
 
         // When
-        Object resultado = transformador.transformar(TransformadorRequest);
+        Object resultado = transformador.transformar(request);
 
         // Then
         assertEquals(new BigDecimal("0.01"), resultado);
@@ -68,10 +68,10 @@ class TransformadorLongParaBigDecimalTest {
     void deveTransformarUnidadeParaMilhar() {
         // Given
         contexto.set("valorProduto", 1L);
-        String[] params = {"valorProduto", "3"};
+        var request = new TransformadorRequest(new String[]{"valorProduto", "3"}, null, contexto);
 
         // When
-        Object resultado = transformador.transformar(TransformadorRequest);
+        Object resultado = transformador.transformar(request);
 
         // Then
         assertEquals(new BigDecimal("0.001"), resultado);
@@ -80,39 +80,39 @@ class TransformadorLongParaBigDecimalTest {
     @Test
     void deveLancarExcecaoParaNumeroInvalidoDeParametros() {
         // Given
-        String[] params = {"variaveis$.valorProduto"};
+        var request = new TransformadorRequest(new String[]{"variaveis$.valorProduto"}, null, contexto);
 
         // When & Then
-        assertThrows(IllegalArgumentException.class, () -> transformador.transformar(TransformadorRequest));
+        assertThrows(IllegalArgumentException.class, () -> transformador.transformar(request));
     }
 
     @Test
     void deveLancarExcecaoQuandoVariavelNaoForNumerica() {
         // Given
         contexto.set("valorProduto", "nao-e-numero");
-        String[] params = {"variaveis$.valorProduto", "2"};
+        var request = new TransformadorRequest(new String[]{"variaveis$.valorProduto", "2"}, null, contexto);
 
         // When & Then
-        assertThrows(IllegalArgumentException.class, () -> transformador.transformar(TransformadorRequest));
+        assertThrows(IllegalArgumentException.class, () -> transformador.transformar(request));
     }
 
     @Test
     void deveLancarExcecaoQuandoVariavelNaoExistir() {
         // Given
-        String[] params = {"variaveis$.variavelInexistente", "2"};
+        var request = new TransformadorRequest(new String[]{"variaveis$.variavelInexistente", "2"}, null, contexto);
 
         // When & Then
-        assertThrows(IllegalArgumentException.class, () -> transformador.transformar(TransformadorRequest));
+        assertThrows(IllegalArgumentException.class, () -> transformador.transformar(request));
     }
 
     @Test
     void deveLidarComParametrosComEspacos() {
         // Given
         contexto.set("valorProduto", 12345L);
-        String[] params = {"  variaveis$.valorProduto  ", "  2  "};
+        var request = new TransformadorRequest(new String[]{"  variaveis$.valorProduto  ", "  2  "}, null, contexto);
 
         // When
-        Object resultado = transformador.transformar(TransformadorRequest);
+        Object resultado = transformador.transformar(request);
 
         // Then
         assertEquals(new BigDecimal("123.45"), resultado);
@@ -122,10 +122,10 @@ class TransformadorLongParaBigDecimalTest {
     void deveFuncionarSemPrefixoVariaveis() {
         // Given
         contexto.set("valorProduto", 12345L);
-        String[] params = {"valorProduto", "2"};
+        var request = new TransformadorRequest(new String[]{"valorProduto", "2"}, null, contexto);
 
         // When
-        Object resultado = transformador.transformar(TransformadorRequest);
+        Object resultado = transformador.transformar(request);
 
         // Then
         assertEquals(new BigDecimal("123.45"), resultado);

@@ -1,6 +1,7 @@
 package com.kaikeventura.dynamic_orchestrator.transform;
 
 import com.kaikeventura.dynamic_orchestrator.engine.VariavelContexto;
+import com.kaikeventura.dynamic_orchestrator.model.FluxoConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,6 +25,9 @@ class ExpressaoJavaExecutorTest {
     @Mock
     private Transformador transformador;
 
+    @Mock
+    private FluxoConfig fluxoConfig;
+
     private VariavelContexto contexto;
 
     @BeforeEach
@@ -34,18 +38,18 @@ class ExpressaoJavaExecutorTest {
     @Test
     void deveExecutarExpressaoComSucesso() {
         // Given
+        contexto.set("var1", 15);
         String expressao = "{{java(soma(var1, 10))}}";
-        String[] params = {"var1", "10"};
         when(factory.getTransformador("soma")).thenReturn(transformador);
-        when(transformador.transformar(TransformadorRequest)).thenReturn(25);
+        when(transformador.transformar(any(TransformadorRequest.class))).thenReturn(25);
 
         // When
-        Object resultado = expressaoJavaExecutor.executar(expressao, contexto);
+        Object resultado = expressaoJavaExecutor.executar(expressao, fluxoConfig, contexto);
 
         // Then
         assertEquals(25, resultado);
         verify(factory).getTransformador("soma");
-        verify(transformador).transformar(TransformadorRequest);
+        verify(transformador).transformar(any(TransformadorRequest.class));
     }
 
     @Test
@@ -54,7 +58,7 @@ class ExpressaoJavaExecutorTest {
         String expressao = "apenas uma string normal";
 
         // When
-        Object resultado = expressaoJavaExecutor.executar(expressao, contexto);
+        Object resultado = expressaoJavaExecutor.executar(expressao, fluxoConfig, contexto);
 
         // Then
         assertEquals(expressao, resultado);
@@ -68,19 +72,19 @@ class ExpressaoJavaExecutorTest {
         when(factory.getTransformador("naoExiste")).thenThrow(new IllegalArgumentException("Transformador não encontrado"));
 
         // When & Then
-        assertThrows(IllegalArgumentException.class, () -> expressaoJavaExecutor.executar(expressao, contexto));
+        assertThrows(IllegalArgumentException.class, () -> expressaoJavaExecutor.executar(expressao, fluxoConfig, contexto));
     }
 
     @Test
     void deveLidarComEspacosEmBrancoNaExpressao() {
         // Given
+        contexto.set("var1", 15);
         String expressao = "{{java(  soma  (  var1  ,  10  )  )}}";
-        String[] params = {"var1", "10"};
         when(factory.getTransformador("soma")).thenReturn(transformador);
-        when(transformador.transformar(TransformadorRequest)).thenReturn(25);
+        when(transformador.transformar(any(TransformadorRequest.class))).thenReturn(25);
 
         // When
-        Object resultado = expressaoJavaExecutor.executar(expressao, contexto);
+        Object resultado = expressaoJavaExecutor.executar(expressao, fluxoConfig, contexto);
 
         // Then
         assertEquals(25, resultado);
@@ -90,16 +94,15 @@ class ExpressaoJavaExecutorTest {
     void deveExecutarExpressaoSemParametros() {
         // Given
         String expressao = "{{java(agora())}}";
-        String[] params = {""};
         when(factory.getTransformador("agora")).thenReturn(transformador);
-        when(transformador.transformar(TransformadorRequest)).thenReturn("2023-10-27");
+        when(transformador.transformar(any(TransformadorRequest.class))).thenReturn("2023-10-27");
 
         // When
-        Object resultado = expressaoJavaExecutor.executar(expressao, contexto);
+        Object resultado = expressaoJavaExecutor.executar(expressao, fluxoConfig, contexto);
 
         // Then
         assertEquals("2023-10-27", resultado);
         verify(factory).getTransformador("agora");
-        verify(transformador).transformar(TransformadorRequest);
+        verify(transformador).transformar(any(TransformadorRequest.class));
     }
 }
