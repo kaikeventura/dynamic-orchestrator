@@ -57,4 +57,39 @@ class DynamicOrchestratorApplicationTests {
                 .andExpect(jsonPath("$.idTransacao").exists())
                 .andExpect(jsonPath("$.transacaoAprovada").exists());
     }
+
+    @Test
+    void deveExecutarFluxoCotacoesMoedas() throws Exception {
+        String requestBody = """
+            {
+                "fluxo": "cotacoes-moedas",
+                "dadosEntrada": {
+                    "nomeMoeda": "USD",
+                    "dataReferenciaCotacao": "2025-09-18"
+                }
+            }
+            """;
+
+        mockMvc.perform(post("/fluxos/executar")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.cotacoes").exists())
+                .andExpect(jsonPath("$.cotacoes").isNotEmpty())
+                .andExpect(jsonPath("$.cotacoes[0].cotacaoCompra").exists())
+                .andExpect(jsonPath("$.cotacoes[0].cotacaoCompra").isNumber())
+                .andExpect(jsonPath("$.cotacoes[0].cotacaoVenda").exists())
+                .andExpect(jsonPath("$.cotacoes[0].cotacaoVenda").isNumber())
+                .andExpect(jsonPath("$.cotacoes[0].tipoBoletim").exists())
+                .andExpect(jsonPath("$.cotacoes[0].tipoBoletim").isString())
+                .andExpect(jsonPath("$.cotacoes[0].dataHoraCotacao").exists())
+                .andExpect(jsonPath("$.cotacoes[0].dataHoraCotacao").isNotEmpty())
+                .andExpect(jsonPath("$.cotacoes[0].paridadeCompra").exists())
+                .andExpect(jsonPath("$.cotacoes[0].paridadeCompra").isNumber())
+                .andExpect(jsonPath("$.cotacoes[0].paridadeVenda").exists())
+                .andExpect(jsonPath("$.cotacoes[0].paridadeVenda").isNumber())
+
+
+        ;
+    }
 }
