@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 @Component
 public class ExpressaoJavaExecutor {
 
-    private static final Pattern JAVA_PATTERN = Pattern.compile("\\{\\{java\\((.+)\\)\\}\\}");
+    private static final Pattern JAVA_PATTERN = Pattern.compile("\\{\\{java\\((.+)\\)}}");
 
     private final TransformadorFactory factory;
 
