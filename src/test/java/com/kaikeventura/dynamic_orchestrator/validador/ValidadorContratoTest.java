@@ -1,6 +1,7 @@
 package com.kaikeventura.dynamic_orchestrator.validador;
 
-import com.kaikeventura.dynamic_orchestrator.model.FluxoConfig;
+import com.kaikeventura.dynamic_orchestrator.model.contract.CampoContrato;
+import com.kaikeventura.dynamic_orchestrator.model.contract.Contrato;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -24,8 +25,8 @@ class ValidadorContratoTest {
     @Test
     void deveValidarComSucessoQuandoCamposObrigatoriosEstaoPresentes() {
         // Given
-        FluxoConfig.Contrato contrato = new FluxoConfig.Contrato();
-        FluxoConfig.CampoContrato campoObrigatorio = new FluxoConfig.CampoContrato("id1", "campo1", true);
+        Contrato contrato = new Contrato();
+        CampoContrato campoObrigatorio = new CampoContrato("id1", "campo1", true);
         contrato.setEntrada(Collections.singletonList(campoObrigatorio));
 
         Map<String, Object> dadosEntrada = Collections.singletonMap("campo1", "valor");
@@ -37,8 +38,8 @@ class ValidadorContratoTest {
     @Test
     void deveLancarExcecaoQuandoCampoObrigatorioEstaAusente() {
         // Given
-        FluxoConfig.Contrato contrato = new FluxoConfig.Contrato();
-        FluxoConfig.CampoContrato campoObrigatorio = new FluxoConfig.CampoContrato("id1", "campo1", true);
+        Contrato contrato = new Contrato();
+        CampoContrato campoObrigatorio = new CampoContrato("id1", "campo1", true);
         contrato.setEntrada(Collections.singletonList(campoObrigatorio));
 
         Map<String, Object> dadosEntrada = Collections.emptyMap();
@@ -50,8 +51,8 @@ class ValidadorContratoTest {
     @Test
     void deveValidarComSucessoQuandoNaoHaCamposObrigatorios() {
         // Given
-        FluxoConfig.Contrato contrato = new FluxoConfig.Contrato();
-        FluxoConfig.CampoContrato campoOpcional = new FluxoConfig.CampoContrato("id1", "campo1", false);
+        Contrato contrato = new Contrato();
+        CampoContrato campoOpcional = new CampoContrato("id1", "campo1", false);
         contrato.setEntrada(Collections.singletonList(campoOpcional));
 
         Map<String, Object> dadosEntrada = Collections.emptyMap();
@@ -63,8 +64,8 @@ class ValidadorContratoTest {
     @Test
     void deveValidarComSucessoQuandoHaCamposExtrasNaEntrada() {
         // Given
-        FluxoConfig.Contrato contrato = new FluxoConfig.Contrato();
-        FluxoConfig.CampoContrato campoObrigatorio = new FluxoConfig.CampoContrato("id1", "campo1", true);
+        Contrato contrato = new Contrato();
+        CampoContrato campoObrigatorio = new CampoContrato("id1", "campo1", true);
         contrato.setEntrada(Collections.singletonList(campoObrigatorio));
 
         Map<String, Object> dadosEntrada = new HashMap<>();
@@ -78,9 +79,9 @@ class ValidadorContratoTest {
     @Test
     void deveValidarComSucessoQuandoCampoOpcionalEstaAusente() {
         // Given
-        FluxoConfig.Contrato contrato = new FluxoConfig.Contrato();
-        FluxoConfig.CampoContrato campoObrigatorio = new FluxoConfig.CampoContrato("id1", "campo1", true);
-        FluxoConfig.CampoContrato campoOpcional = new FluxoConfig.CampoContrato("id2", "campo2", false);
+        Contrato contrato = new Contrato();
+        CampoContrato campoObrigatorio = new CampoContrato("id1", "campo1", true);
+        CampoContrato campoOpcional = new CampoContrato("id2", "campo2", false);
         contrato.setEntrada(Arrays.asList(campoObrigatorio, campoOpcional));
 
         Map<String, Object> dadosEntrada = Collections.singletonMap("campo1", "valor");

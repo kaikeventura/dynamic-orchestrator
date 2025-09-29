@@ -1,10 +1,11 @@
 package com.kaikeventura.dynamic_orchestrator.engine;
 
-import com.kaikeventura.dynamic_orchestrator.model.FluxoConfig;
+import com.kaikeventura.dynamic_orchestrator.model.metadata.Variavel;
+import com.kaikeventura.dynamic_orchestrator.model.orchestrator.step.PassoBase;
 
 import java.util.List;
 
 public interface PassoExecutor {
     boolean suporta(String tipo);
-    void executarPasso(FluxoConfig.PassoBase passo, List<FluxoConfig.Variavel> variaveis, VariavelContexto contexto) throws Exception;
+    void executarPasso(PassoBase passo, List<Variavel> variaveis, VariavelContexto contexto) throws Exception;
 }

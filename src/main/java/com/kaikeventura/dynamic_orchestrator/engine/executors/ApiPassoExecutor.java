@@ -4,7 +4,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kaikeventura.dynamic_orchestrator.engine.PassoExecutor;
 import com.kaikeventura.dynamic_orchestrator.engine.VariavelContexto;
 import com.kaikeventura.dynamic_orchestrator.engine.VariavelSubstituidor;
-import com.kaikeventura.dynamic_orchestrator.model.FluxoConfig;
+import com.kaikeventura.dynamic_orchestrator.model.metadata.Variavel;
+import com.kaikeventura.dynamic_orchestrator.model.orchestrator.integration.api.Requisicao;
+import com.kaikeventura.dynamic_orchestrator.model.orchestrator.step.PassoAPI;
+import com.kaikeventura.dynamic_orchestrator.model.orchestrator.step.PassoBase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
@@ -27,9 +30,9 @@ public class ApiPassoExecutor implements PassoExecutor {
     }
 
     @Override
-    public void executarPasso(FluxoConfig.PassoBase passo, List<FluxoConfig.Variavel> variaveis, VariavelContexto contexto) {
-        var passoAPI = (FluxoConfig.PassoAPI) passo;
-        FluxoConfig.Requisicao req = passoAPI.getIntegracao().getRequisicao();
+    public void executarPasso(PassoBase passo, List<Variavel> variaveis, VariavelContexto contexto) {
+        var passoAPI = (PassoAPI) passo;
+        Requisicao req = passoAPI.getIntegracao().getRequisicao();
 
         Map<String, Object> headersMap = VariavelSubstituidor.substituir(req.getHeaders(), contexto);
         Map<String, Object> queryParams = VariavelSubstituidor.substituir(req.getQueryParams(), contexto);
@@ -78,13 +81,13 @@ public class ApiPassoExecutor implements PassoExecutor {
     }
 
     private void salvarRespostaNoContexto(
-            FluxoConfig.PassoAPI passo,
+            PassoAPI passo,
             LinkedHashMap<Object, Object> responseBody,
-            List<FluxoConfig.Variavel> variaveis,
+            List<Variavel> variaveis,
             VariavelContexto contexto
     ) {
         // percorre todas as variáveis do fluxo
-        for (FluxoConfig.Variavel var : variaveis) {
+        for (Variavel var : variaveis) {
 
             // só considera variáveis que vêm do orquestrador
             if ("orquestrador".equals(var.getOrigem().getTipoReferencia())) {

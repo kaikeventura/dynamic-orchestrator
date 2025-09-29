@@ -1,10 +1,12 @@
 package com.kaikeventura.dynamic_orchestrator.engine.executors;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kaikeventura.dynamic_orchestrator.engine.PassoExecutor;
 import com.kaikeventura.dynamic_orchestrator.engine.VariavelContexto;
 import com.kaikeventura.dynamic_orchestrator.engine.VariavelSubstituidor;
-import com.kaikeventura.dynamic_orchestrator.model.FluxoConfig;
+import com.kaikeventura.dynamic_orchestrator.model.metadata.Variavel;
+import com.kaikeventura.dynamic_orchestrator.model.orchestrator.integration.dynamodb.IntegracaoDynamoDB;
+import com.kaikeventura.dynamic_orchestrator.model.orchestrator.step.PassoBase;
+import com.kaikeventura.dynamic_orchestrator.model.orchestrator.step.PassoDynamoDB;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
@@ -21,7 +23,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class DynamoDbPassoExecutor implements PassoExecutor {
 
-    private final ObjectMapper objectMapper;
     private final DynamoDbClient dynamoDbClient;
 
     @Override
@@ -30,8 +31,8 @@ public class DynamoDbPassoExecutor implements PassoExecutor {
     }
 
     @Override
-    public void executarPasso(FluxoConfig.PassoBase passo, List<FluxoConfig.Variavel> variaveis, VariavelContexto contexto) {
-        var passoDynamoDB = (FluxoConfig.PassoDynamoDB) passo;
+    public void executarPasso(PassoBase passo, List<Variavel> variaveis, VariavelContexto contexto) {
+        var passoDynamoDB = (PassoDynamoDB) passo;
         var integracao = passoDynamoDB.getIntegracao();
         String operacao = integracao.getOperacao().name();
 
@@ -43,9 +44,9 @@ public class DynamoDbPassoExecutor implements PassoExecutor {
     }
 
     private void executarQuery(
-            FluxoConfig.PassoDynamoDB passo,
-            FluxoConfig.IntegracaoDynamoDB integracao,
-            List<FluxoConfig.Variavel> variaveis,
+            PassoDynamoDB passo,
+            IntegracaoDynamoDB integracao,
+            List<Variavel> variaveis,
             VariavelContexto contexto
     ) {
         var nomeTabela = integracao.getNomeTabela();
@@ -88,7 +89,7 @@ public class DynamoDbPassoExecutor implements PassoExecutor {
     }
 
     private void executarPersistencia(
-            FluxoConfig.IntegracaoDynamoDB integracao,
+            IntegracaoDynamoDB integracao,
             VariavelContexto contexto
     ) {
         var nomeTabela = integracao.getNomeTabela();
@@ -121,9 +122,9 @@ public class DynamoDbPassoExecutor implements PassoExecutor {
     }
 
     private void salvarResultadoNoContexto(
-            FluxoConfig.PassoDynamoDB passo,
+            PassoDynamoDB passo,
             Map<String, Object> resultado,
-            List<FluxoConfig.Variavel> variaveis,
+            List<Variavel> variaveis,
             VariavelContexto contexto
     ) {
         for (var variavel : variaveis) {

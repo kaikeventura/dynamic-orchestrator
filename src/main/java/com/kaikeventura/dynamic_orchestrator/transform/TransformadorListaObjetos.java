@@ -1,6 +1,7 @@
 package com.kaikeventura.dynamic_orchestrator.transform;
 
-import com.kaikeventura.dynamic_orchestrator.model.FluxoConfig;
+import com.kaikeventura.dynamic_orchestrator.model.metadata.CamposMapeamento;
+import com.kaikeventura.dynamic_orchestrator.model.metadata.Mapeamento;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -37,7 +38,7 @@ public class TransformadorListaObjetos implements Transformador {
             throw new IllegalArgumentException("A variável da lista '" + variavelId + "' não foi encontrada no contexto.");
         }
 
-        FluxoConfig.Mapeamento mapeamento = config.getMetadados().getMapeamentos().stream()
+        Mapeamento mapeamento = config.getMetadados().getMapeamentos().stream()
                 .filter(m -> m.getId().equals(mapeamentoId))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("O mapeamento '" + mapeamentoId + "' não foi encontrado nos metadados."));
@@ -46,7 +47,7 @@ public class TransformadorListaObjetos implements Transformador {
         List<Map<String, Object>> listaTransformada = new ArrayList<>();
         for (Map<String, Object> objetoOriginal : listaOriginal) {
             Map<String, Object> objetoTransformado = new HashMap<>();
-            for (FluxoConfig.CamposMapeamento campoMapeamento : mapeamento.getCampos()) {
+            for (CamposMapeamento campoMapeamento : mapeamento.getCampos()) {
                 String chaveOrigem = campoMapeamento.getOrigem();
                 String chaveDestino = campoMapeamento.getDestino();
 

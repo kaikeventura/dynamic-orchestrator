@@ -1,6 +1,10 @@
 package com.kaikeventura.dynamic_orchestrator.engine;
 
 import com.kaikeventura.dynamic_orchestrator.model.FluxoConfig;
+import com.kaikeventura.dynamic_orchestrator.model.contract.CampoContrato;
+import com.kaikeventura.dynamic_orchestrator.model.contract.CampoContratoSaida;
+import com.kaikeventura.dynamic_orchestrator.model.metadata.Variavel;
+import com.kaikeventura.dynamic_orchestrator.model.orchestrator.step.PassoBase;
 import com.kaikeventura.dynamic_orchestrator.transform.ExpressaoJavaExecutor;
 import com.kaikeventura.dynamic_orchestrator.validador.ValidadorContrato;
 import lombok.RequiredArgsConstructor;
@@ -25,16 +29,16 @@ public class FluxoEngine {
         validadorContrato.validar(config.getContrato(), dadosEntrada);
         inicializarVariaveis(config, dadosEntrada, contexto);
 
-        List<FluxoConfig.Variavel> variaveis = config.getMetadados().getVariaveis();
+        List<Variavel> variaveis = config.getMetadados().getVariaveis();
         config.getOrquestrador().getPassos().stream()
-                .sorted(Comparator.comparingInt(FluxoConfig.PassoBase::getOrdem))
+                .sorted(Comparator.comparingInt(PassoBase::getOrdem))
                 .forEach(passo -> executarPasso(passo, variaveis, contexto));
 
         return montarSaida(config, contexto);
     }
 
     private void inicializarVariaveis(FluxoConfig config, Map<String, Object> dadosEntrada, VariavelContexto contexto) {
-        for (FluxoConfig.Variavel var : config.getMetadados().getVariaveis()) {
+        for (Variavel var : config.getMetadados().getVariaveis()) {
             if ("contrato".equals(var.getOrigem().getTipoReferencia())) {
 
                 String idContrato = var.getOrigem().getIdReferencia()
@@ -44,7 +48,7 @@ public class FluxoEngine {
                 String nomeCampo = config.getContrato().getEntrada().stream()
                         .filter(c -> c.getId().equals(idContrato))
                         .findFirst()
-                        .map(FluxoConfig.CampoContrato::getNomeCampo)
+                        .map(CampoContrato::getNomeCampo)
                         .orElseThrow(() -> new IllegalArgumentException("Campo não encontrado no contrato: " + idContrato));
 
                 Object valor = dadosEntrada.get(nomeCampo);
@@ -54,7 +58,7 @@ public class FluxoEngine {
         }
     }
 
-    private void executarPasso(FluxoConfig.PassoBase passo, List<FluxoConfig.Variavel> variaveis, VariavelContexto contexto) {
+    private void executarPasso(PassoBase passo, List<Variavel> variaveis, VariavelContexto contexto) {
         try {
             PassoExecutor executor = executorFactory.getExecutor(passo.getTipo());
             executor.executarPasso(passo, variaveis, contexto);
@@ -65,7 +69,7 @@ public class FluxoEngine {
 
     private Map<String, Object> montarSaida(FluxoConfig config, VariavelContexto contexto) {
         Map<String, Object> saida = new HashMap<>();
-        for (FluxoConfig.CampoContratoSaida campoSaida : config.getContrato().getSaida()) {
+        for (CampoContratoSaida campoSaida : config.getContrato().getSaida()) {
             String valor = campoSaida.getValor();
             if (valor.contains("{{java")) {
                 saida.put(campoSaida.getNomeCampo(), expressaoJavaExecutor.executar(valor, config, contexto));

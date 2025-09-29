@@ -2,6 +2,9 @@ package com.kaikeventura.dynamic_orchestrator.transform;
 
 import com.kaikeventura.dynamic_orchestrator.engine.VariavelContexto;
 import com.kaikeventura.dynamic_orchestrator.model.FluxoConfig;
+import com.kaikeventura.dynamic_orchestrator.model.metadata.CamposMapeamento;
+import com.kaikeventura.dynamic_orchestrator.model.metadata.Mapeamento;
+import com.kaikeventura.dynamic_orchestrator.model.metadata.Metadados;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -22,7 +25,7 @@ class TransformadorListaObjetosTest {
         transformador = new TransformadorListaObjetos();
         contexto = new VariavelContexto();
         fluxoConfig = new FluxoConfig();
-        fluxoConfig.setMetadados(new FluxoConfig.Metadados());
+        fluxoConfig.setMetadados(new Metadados());
     }
 
     @Test
@@ -34,7 +37,7 @@ class TransformadorListaObjetosTest {
         );
         contexto.set("variavel-lista-cotacoes", listaOriginal);
 
-        FluxoConfig.Mapeamento mapeamento = criarMapeamentoCotacoes();
+        Mapeamento mapeamento = criarMapeamentoCotacoes();
         fluxoConfig.getMetadados().setMapeamentos(List.of(mapeamento));
 
         var request = new TransformadorRequest(
@@ -127,15 +130,15 @@ class TransformadorListaObjetosTest {
         assertTrue(resultado.isEmpty());
     }
 
-    private FluxoConfig.Mapeamento criarMapeamentoCotacoes() {
-        FluxoConfig.Mapeamento mapeamento = new FluxoConfig.Mapeamento();
+    private Mapeamento criarMapeamentoCotacoes() {
+        Mapeamento mapeamento = new Mapeamento();
         mapeamento.setId("mapeamento-cotacoes");
 
-        FluxoConfig.CamposMapeamento campo1 = new FluxoConfig.CamposMapeamento();
+        CamposMapeamento campo1 = new CamposMapeamento();
         campo1.setOrigem("paridade_compra");
         campo1.setDestino("paridadeCompra");
 
-        FluxoConfig.CamposMapeamento campo2 = new FluxoConfig.CamposMapeamento();
+        CamposMapeamento campo2 = new CamposMapeamento();
         campo2.setOrigem("paridade_venda");
         campo2.setDestino("paridadeVenda");
 
